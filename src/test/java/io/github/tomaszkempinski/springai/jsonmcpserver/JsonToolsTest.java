@@ -1,5 +1,6 @@
 package io.github.tomaszkempinski.springai.jsonmcpserver;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -120,5 +121,35 @@ class JsonToolsTest {
 
     String result = tool.validateJsonSchema(context, "{ invalid json }", null);
     assertTrue(result.contains("Error reading or parsing JSON schema"));
+  }
+
+  @Test
+  void testQueryJson() throws IOException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    JsonTools tool = new JsonTools(objectMapper);
+    McpSyncRequestContext context = mock(McpSyncRequestContext.class);
+
+    File tempFile = File.createTempFile("test_search", ".json");
+    String content =
+        """
+            [
+              {"id": 1, "name": "Apple", "color": "red"},
+              {"id": 2, "name": "Banana", "color": "yellow"},
+              {"id": 3, "name": "Cherry", "color": "red"}
+            ]
+            """;
+    Files.writeString(tempFile.toPath(), content);
+
+    try {
+      // Search for names of red fruits
+      String result =
+          tool.queryJson(context, tempFile.getAbsolutePath(), "$[?(@.color == 'red')].name");
+      System.out.println("Search Result:\n" + result);
+      assertTrue(result.contains("Apple"));
+      assertTrue(result.contains("Cherry"));
+      assertFalse(result.contains("Banana"));
+    } finally {
+      tempFile.delete();
+    }
   }
 }

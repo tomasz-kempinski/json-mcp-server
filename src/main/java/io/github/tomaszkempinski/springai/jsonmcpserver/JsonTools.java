@@ -2,6 +2,7 @@ package io.github.tomaszkempinski.springai.jsonmcpserver;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 import com.networknt.schema.*;
 import com.networknt.schema.Error;
 import com.networknt.schema.dialect.Dialects;
@@ -106,6 +107,47 @@ public class JsonTools {
     } catch (Exception e) {
       context.error("Unexpected error during schema validation: " + e.getMessage());
       return "Unexpected error during schema validation: " + e.getMessage();
+    }
+  }
+
+  @McpTool(
+      name = "query_json",
+      description =
+          """
+                Searches a local JSON file using JsonPath query and returns the result as a JSON string
+
+                Parameters:
+                - absolutePath: absolute path to the local JSON file
+                - query: JsonPath expression
+
+                Examples:
+                - $.users[*].name
+                - $.orders[?(@.total > 100)]
+                - $.users[?(@.active == true && @.age > 30)]
+                """)
+  public String queryJson(
+      McpSyncRequestContext context,
+      @McpToolParam(description = "The absolute path to the local JSON file") String absolutePath,
+      @McpToolParam(description = "The JsonPath query to execute (e.g. '$.store.book[*].author')")
+          String query) {
+
+    context.info("Searching JSON file: " + absolutePath + " with query: " + query);
+
+    try {
+      File file = new File(absolutePath);
+      if (!file.exists()) {
+        context.error("File does not exist at path: " + absolutePath);
+        return "Error: File does not exist at path: " + absolutePath;
+      }
+
+      Object result = JsonPath.read(file, query);
+      return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
+    } catch (IOException e) {
+      context.error("Error reading JSON file: " + e.getMessage());
+      return "Error reading JSON file: " + e.getMessage();
+    } catch (Exception e) {
+      context.error("Error executing JsonPath query: " + e.getMessage());
+      return "Error executing JsonPath query: " + e.getMessage();
     }
   }
 }
