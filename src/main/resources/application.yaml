@@ -1,3 +1,19 @@
+server:
+  port: 3000
+
 spring:
   application:
-    name: json-mcp-server
+    name: json-mcp-server-spring-ai
+  ai:
+    mcp:
+      server:
+        name: json-mcp-server
+        protocol: STREAMABLE
+        version: 0.0.1
+
+logging:
+  level:
+    io:
+      modelcontextprotocol:
+        client: DEBUG
+        spec: DEBUG
