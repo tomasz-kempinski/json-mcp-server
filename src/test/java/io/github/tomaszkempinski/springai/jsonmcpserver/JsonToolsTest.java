@@ -43,4 +43,82 @@ class JsonToolsTest {
     String result = tool.generateJsonSchema(context, "non_existent_file.json");
     assertTrue(result.contains("Error: File does not exist"));
   }
+
+  @Test
+  void testValidateJsonSchemaSuccess() {
+    ObjectMapper objectMapper = new ObjectMapper();
+    JsonTools tool = new JsonTools(objectMapper);
+    McpSyncRequestContext context = mock(McpSyncRequestContext.class);
+
+    String schema =
+        """
+            {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" }
+              }
+            }
+            """;
+
+    String result = tool.validateJsonSchema(context, schema, null);
+    assertTrue(result.contains("Schema is valid"));
+  }
+
+  @Test
+  void testValidateJsonSchemaInvalid() {
+    ObjectMapper objectMapper = new ObjectMapper();
+    JsonTools tool = new JsonTools(objectMapper);
+    McpSyncRequestContext context = mock(McpSyncRequestContext.class);
+
+    // Invalid schema: "type" should be a string or array, not a number
+    String schema =
+        """
+            {
+              "type": 123
+            }
+            """;
+
+    String result = tool.validateJsonSchema(context, schema, null);
+    assertTrue(result.contains("Schema validation failed") || result.contains("Error"));
+  }
+
+  @Test
+  void testValidateJsonSchemaFromFile() throws IOException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    JsonTools tool = new JsonTools(objectMapper);
+    McpSyncRequestContext context = mock(McpSyncRequestContext.class);
+
+    File tempFile = File.createTempFile("schema", ".json");
+    String schema = "{\"type\": \"object\"}";
+    Files.writeString(tempFile.toPath(), schema);
+
+    try {
+      String result = tool.validateJsonSchema(context, null, tempFile.getAbsolutePath());
+      assertTrue(result.contains("Schema is valid"));
+    } finally {
+      tempFile.delete();
+    }
+  }
+
+  @Test
+  void testValidateJsonSchemaNoParams() {
+    ObjectMapper objectMapper = new ObjectMapper();
+    JsonTools tool = new JsonTools(objectMapper);
+    McpSyncRequestContext context = mock(McpSyncRequestContext.class);
+
+    String result = tool.validateJsonSchema(context, null, null);
+    assertTrue(result.contains("Error"));
+    assertTrue(result.contains("must be provided"));
+  }
+
+  @Test
+  void testValidateJsonSchemaBrokenJson() {
+    ObjectMapper objectMapper = new ObjectMapper();
+    JsonTools tool = new JsonTools(objectMapper);
+    McpSyncRequestContext context = mock(McpSyncRequestContext.class);
+
+    String result = tool.validateJsonSchema(context, "{ invalid json }", null);
+    assertTrue(result.contains("Error reading or parsing JSON schema"));
+  }
 }
