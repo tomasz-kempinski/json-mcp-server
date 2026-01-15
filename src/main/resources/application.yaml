@@ -2,8 +2,6 @@ server:
   port: 3000
 
 spring:
-  application:
-    name: json-mcp-server-spring-ai
   ai:
     mcp:
       server:
@@ -15,10 +13,12 @@ logging:
   level:
     io:
       modelcontextprotocol:
-        client: DEBUG
-        spec: DEBUG
+        client: ${MCP_LOG_LEVEL:INFO}
+        spec: ${MCP_LOG_LEVEL:INFO}
+        server: ${MCP_LOG_LEVEL:INFO}
+        mcp: ${MCP_LOG_LEVEL:INFO}
 
 mcp:
   tools:
     file:
-      allowed-extensions: .json, .jsonc, .jsonl
+      allowed-extensions: .json
