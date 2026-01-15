@@ -31,6 +31,7 @@ ext {
 
 dependencies {
 	implementation 'org.springframework.ai:spring-ai-starter-mcp-server-webmvc'
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
 	implementation "com.jayway.jsonpath:json-path:2.10.0"
 	implementation 'com.github.saasquatch:json-schema-inferrer:0.2.1'
 	implementation 'com.networknt:json-schema-validator:3.0.0'
