@@ -17,3 +17,8 @@ logging:
       modelcontextprotocol:
         client: DEBUG
         spec: DEBUG
+
+mcp:
+  tools:
+    file:
+      allowed-extensions: .json, .jsonc, .jsonl
