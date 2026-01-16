@@ -1,0 +1,20 @@
+spring:
+  main:
+    web-application-type: none
+    banner-mode: off
+  ai:
+    mcp:
+      server:
+        name: json-mcp-server
+        type: SYNC
+        stdio: true
+
+logging:
+  level:
+    root: OFF
+    io:
+      modelcontextprotocol:
+        client: OFF
+        spec: OFF
+        server: OFF
+        mcp: OFF

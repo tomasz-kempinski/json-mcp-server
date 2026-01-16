@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'io.github.tomasz-kempinski.springai'
-version = '0.0.1-SNAPSHOT'
+version = '1.0.0-SNAPSHOT'
 description = 'MCP server for JSON files'
 
 java {
@@ -14,14 +14,41 @@ java {
 	}
 }
 
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
 repositories {
 	mavenCentral()
+	maven { url = 'https://jitpack.io' }
+}
+
+ext {
+	set('springAiVersion', "1.1.2")
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.springframework.ai:spring-ai-starter-mcp-server-webmvc'
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
+	implementation "com.jayway.jsonpath:json-path:2.10.0"
+	implementation 'com.github.saasquatch:json-schema-inferrer:0.2.1'
+	implementation 'com.networknt:json-schema-validator:3.0.0'
+
+	compileOnly 'org.projectlombok:lombok'
+
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+	annotationProcessor 'org.projectlombok:lombok'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
+	}
 }
 
 tasks.named('test') {

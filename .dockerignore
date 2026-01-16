@@ -1,0 +1,13 @@
+.gradle
+build
+!build/libs/*.jar
+.git
+.gitignore
+.idea
+.vscode
+*.log
+.DS_Store
+Dockerfile
+.dockerignore
+# gradlew
+# gradle/
